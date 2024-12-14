@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filter and Sort Garena</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    h1 {
+      color: #333;
+    }
+    input[type="file"] {
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background: #f9f9f9;
+      padding: 15px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>Filter and Sort Garena</h1>
+  <p>Upload your file to filter and sort lines containing <strong>garena.com</strong>.</p>
+  <input type="file" id="fileInput" accept=".txt">
+  <button onclick="processFile()">Filter and Sort</button>
+  <h2>Filtered and Sorted Result:</h2>
+  <pre id="output"></pre>
+
+  <script>
+    function processFile() {
+      const fileInput = document.getElementById('fileInput');
+      const output = document.getElementById('output');
+      
+      // Ensure a file is selected
+      if (!fileInput.files.length) {
+        alert('Please select a file to process.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      // Read the file contents
+      reader.onload = function(event) {
+        const content = event.target.result;
+
+        // Parse lines, filter by "garena.com", split into URL, LOG, PASS
+        const lines = content.trim().split('\n');
+        const filteredAndSortedLines = lines
+          .filter(line => line.includes('garena.com')) // Keep only lines with "garena.com"
+          .map(line => {
+            const parts = line.split(':');
+            return { url: parts[0], logPass: parts.slice(1).join(':') };
+          })
+          .sort((a, b) => a.url.localeCompare(b.url)) // Sort by URL
+          .map(item => item.logPass); // Extract LOG:PASS
+
+        // Display filtered and sorted results
+        output.textContent = filteredAndSortedLines.length
+          ? filteredAndSortedLines.join('\n')
+          : 'No lines containing "garena.com" found.';
+      };
+
+      // Handle file reading errors
+      reader.onerror = function() {
+        alert('Failed to read the file. Please try again.');
+      };
+
+      // Read the file as text
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
